@@ -45,7 +45,6 @@
         .manager-only { display: none; }
         body.is-manager .manager-only { display: block; }
 
-        /* Loading Spinner */
         .spinner {
             border: 3px solid rgba(34, 211, 238, 0.1);
             border-top: 3px solid #22d3ee;
@@ -63,33 +62,33 @@
     <div id="entryScreen" class="fixed inset-0 z-[100] flex items-center justify-center p-6">
         <div class="w-full max-w-md data-card p-8 rounded-3xl border border-white/10 shadow-2xl">
             <div class="text-center mb-8">
-                <h1 class="text-3xl font-black italic tracking-tighter text-cyan-400">RESOURCE PORTAL</h1>
-                <p id="portalSubtitle" class="text-slate-500 text-xs uppercase tracking-[0.2em] mt-1">Cloud Synchronization Active</p>
+                <h1 class="text-3xl font-black italic tracking-tighter text-cyan-400">RESEARCH PORTAL</h1>
+                <p id="portalSubtitle" class="text-slate-500 text-xs uppercase tracking-[0.2em] mt-1">Institutional Synchronization Active</p>
             </div>
             
             <form id="entryForm" class="space-y-4">
                 <div>
-                    <label class="block text-[10px] uppercase text-slate-400 font-bold mb-1 ml-1">ID Number</label>
+                    <label class="block text-[10px] uppercase text-slate-400 font-bold mb-1 ml-1">Student / Faculty ID</label>
                     <input type="text" id="nodeUser" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none input-glow transition-all" placeholder="Enter ID">
                 </div>
                 <div>
-                    <label class="block text-[10px] uppercase text-slate-400 font-bold mb-1 ml-1">Secure Key</label>
+                    <label class="block text-[10px] uppercase text-slate-400 font-bold mb-1 ml-1">Access Key</label>
                     <input type="password" id="nodeKey" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none input-glow transition-all" placeholder="••••••••">
                 </div>
-                <div id="entryError" class="text-rose-500 text-xs hidden text-center font-bold">Verification failed. Access restricted.</div>
+                <div id="entryError" class="text-rose-500 text-[10px] hidden text-center font-bold uppercase tracking-widest">Authentication error. Verification required.</div>
                 
-                <button type="submit" id="portalSubmitBtn" class="w-full bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-black py-3 rounded-xl transition-all transform active:scale-95 uppercase tracking-widest text-sm mt-2 flex items-center justify-center gap-2">
-                    <span id="btnText">Access Portal</span>
+                <button type="submit" id="portalSubmitBtn" class="w-full bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-black py-3 rounded-xl transition-all transform active:scale-95 uppercase tracking-widest text-sm mt-2 flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/20">
+                    <span id="btnText">Initialize Session</span>
                     <div id="btnLoader" class="spinner hidden"></div>
                 </button>
             </form>
             
             <div class="mt-6 flex flex-col items-center gap-4">
-                <button id="togglePortalModeBtn" onclick="togglePortalMode()" class="text-[10px] text-cyan-400 hover:underline uppercase font-bold tracking-widest transition-colors">
-                    Request Credentials
+                <button id="togglePortalModeBtn" onclick="togglePortalMode()" class="text-[10px] text-cyan-400 hover:text-cyan-300 uppercase font-bold tracking-widest transition-colors">
+                    Don't have an ID? Register Here
                 </button>
                 <p class="text-center text-slate-600 text-[10px] leading-relaxed">
-                    Protected by Secure Data Protocol.<br>Activity is logged to Central Database.
+                    Access governed by Educational Fair Use policies.<br>Encrypted via Secure Data Protocol.
                 </p>
             </div>
         </div>
@@ -97,27 +96,26 @@
 
     <!-- MAIN INTERFACE -->
     <div id="interface" class="hidden flex h-screen w-full">
-        <!-- SIDE NAVIGATION -->
         <aside class="w-64 bg-slate-950 border-r border-slate-900 flex flex-col">
             <div class="p-6 border-b border-slate-900">
-                <h2 class="text-xl font-black italic text-cyan-400 tracking-tighter">RESOURCE PORTAL</h2>
+                <h2 class="text-xl font-black italic text-cyan-400 tracking-tighter">STUDY PORTAL</h2>
             </div>
             
             <nav class="flex-grow py-6 space-y-1">
                 <div onclick="showSection('docs')" class="nav-item px-6 py-3 flex items-center gap-3 text-sm font-bold text-slate-400 active" data-tab="docs">
-                    <span>📰</span> Publications
+                    <span>📰</span> Literature Feed
                 </div>
                 <div onclick="showSection('tools')" class="nav-item px-6 py-3 flex items-center gap-3 text-sm font-bold text-slate-400" data-tab="tools">
-                    <span>🛠️</span> Interactive Tools
+                    <span>🛠️</span> Compute Modules
                 </div>
                 <div onclick="showSection('media')" class="nav-item px-6 py-3 flex items-center gap-3 text-sm font-bold text-slate-400" data-tab="media">
                     <span>📺</span> Lecture Library
                 </div>
                 <div onclick="showSection('saved')" class="nav-item px-6 py-3 flex items-center gap-3 text-sm font-bold text-slate-400" data-tab="saved">
-                    <span>⭐️</span> Bookmarks
+                    <span>⭐️</span> Citations
                 </div>
                 <div id="managerTab" onclick="showSection('manager')" class="nav-item px-6 py-3 items-center gap-3 text-sm font-bold text-rose-400 hidden" data-tab="manager">
-                    <span>⚙️</span> System Config
+                    <span>⚙️</span> Admin Console
                 </div>
             </nav>
 
@@ -127,87 +125,73 @@
                         <span id="nodeInitial">U</span>
                     </div>
                     <div class="overflow-hidden">
-                        <p id="nodeDisplayUser" class="text-xs font-bold truncate text-slate-200">User</p>
-                        <p class="text-[10px] text-slate-500 uppercase">Cloud Linked</p>
+                        <p id="nodeDisplayUser" class="text-xs font-bold truncate text-slate-200">Researcher</p>
+                        <p class="text-[10px] text-slate-500 uppercase">Status: Connected</p>
                     </div>
                 </div>
                 <button onclick="terminateSession()" class="w-full py-2 border border-slate-800 rounded-lg text-[10px] uppercase font-bold text-slate-500 hover:bg-rose-500/10 hover:text-rose-500 transition-colors">
-                    End Session
+                    Logout
                 </button>
             </div>
         </aside>
 
-        <!-- CONTENT AREA -->
         <main class="flex-grow overflow-y-auto p-8 relative">
             
-            <!-- PUBLICATIONS TAB (The Blog) -->
             <section id="tab-docs" class="tab-content max-w-4xl mx-auto">
                 <header class="mb-8 flex justify-between items-end">
                     <div>
-                        <h2 class="text-3xl font-black italic tracking-tight">DATA FEED</h2>
-                        <p class="text-slate-500 text-sm">Real-time publications from the academic network.</p>
+                        <h2 class="text-3xl font-black italic tracking-tight">DATA REPOSITORY</h2>
+                        <p class="text-slate-500 text-sm">Collaborative academic updates and study logs.</p>
                     </div>
                     <button onclick="openEntryModal()" class="bg-cyan-500 text-slate-950 px-4 py-2 rounded-lg font-bold text-xs uppercase tracking-widest hover:bg-cyan-400 transition-colors">
-                        New Publication
+                        Post Log
                     </button>
                 </header>
 
                 <div id="dataStreamContainer" class="space-y-6">
-                    <!-- Loading State -->
                     <div id="feedLoading" class="flex flex-col items-center justify-center py-20 opacity-50">
                         <div class="spinner mb-4"></div>
-                        <p class="text-xs uppercase tracking-widest font-bold">Syncing Data Feed...</p>
+                        <p class="text-xs uppercase tracking-widest font-bold">Synchronizing Data...</p>
                     </div>
                 </div>
             </section>
             
-            <!-- Other sections remain same structure, hidden until selected -->
             <section id="tab-tools" class="tab-content hidden">
                 <header class="mb-8">
-                    <h2 class="text-3xl font-black italic tracking-tight">TOOLSET REPOSITORY</h2>
-                    <p class="text-slate-500 text-sm">Select a module to initiate processing.</p>
+                    <h2 class="text-3xl font-black italic tracking-tight">COMPUTE REPOSITORY</h2>
+                    <p class="text-slate-500 text-sm">Interactive educational simulations and logic modules.</p>
                 </header>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <div onclick="initModule('flappy_bird.html')" class="data-card rounded-2xl p-5 cursor-pointer group">
-                        <div class="h-32 bg-cyan-900/20 rounded-xl mb-4 flex items-center justify-center relative overflow-hidden">
-                            <span class="text-4xl group-hover:scale-110 transition-transform">📉</span>
-                        </div>
-                        <h3 class="font-bold">Module: Flap</h3>
-                        <div class="flex justify-between items-center mt-2">
-                            <span class="text-[10px] font-bold text-cyan-400 bg-cyan-400/10 px-2 py-0.5 rounded">SIMULATION</span>
-                            <span class="text-[10px] text-slate-500">Value: <span class="metric-val" data-game="nf_highscore">0</span></span>
-                        </div>
-                    </div>
-                    <div onclick="initModule('snake.html')" class="data-card rounded-2xl p-5 cursor-pointer group">
+                    <div onclick="initModule('snake_game.html')" class="data-card rounded-2xl p-5 cursor-pointer group">
                         <div class="h-32 bg-emerald-900/20 rounded-xl mb-4 flex items-center justify-center relative overflow-hidden">
                             <span class="text-4xl group-hover:scale-110 transition-transform">📊</span>
                         </div>
-                        <h3 class="font-bold">Module: Snake</h3>
+                        <h3 class="font-bold">Math: Optimization</h3>
                         <div class="flex justify-between items-center mt-2">
                             <span class="text-[10px] font-bold text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded">ALGORITHM</span>
-                            <span class="text-[10px] text-slate-500">Value: <span class="metric-val" data-game="snake_highscore">0</span></span>
+                            <span class="text-[10px] text-slate-500">Node: Local</span>
                         </div>
                     </div>
+                    <!-- Future tools can be added here -->
                 </div>
             </section>
 
-            <!-- SYSTEM CONFIG PANEL (Root only) -->
             <section id="tab-manager" class="tab-content hidden">
                 <header class="mb-8 p-6 bg-rose-500/10 border border-rose-500/20 rounded-2xl">
-                    <h2 class="text-2xl font-black text-rose-500 italic">SYSTEM OVERRIDE: MANAGEMENT</h2>
-                    <p class="text-rose-400/60 text-sm">User synchronization and global audit logs.</p>
+                    <h2 class="text-2xl font-black text-rose-500 italic">SYSTEM OVERRIDE</h2>
+                    <p class="text-rose-400/60 text-sm">Global synchronization and database management.</p>
                 </header>
-                <div id="managerContent" class="text-slate-500 italic text-sm">Synchronizing user cloud records...</div>
+                <div id="managerContent" class="text-slate-500 italic text-sm">Updating cloud records...</div>
             </section>
 
             <section id="tab-media" class="tab-content hidden pt-20 text-center">
                 <span class="text-6xl mb-4 block">📺</span>
-                <p class="text-slate-500">Media stream offline.</p>
+                <p class="text-slate-500">Video server offline.</p>
             </section>
             
             <section id="tab-saved" class="tab-content hidden pt-20 text-center">
-                <span class="text-6xl mb-4 block">⭐️</span>
-                <p class="text-slate-500">No cached items.</p>
+                <span class="text-6xl mb-4 block">📑</span>
+                <p class="text-slate-500">No saved citations.</p>
             </section>
         </main>
     </div>
@@ -215,14 +199,14 @@
     <!-- PUBLISH MODAL -->
     <div id="entryModal" class="fixed inset-0 z-[200] bg-black/80 backdrop-blur-md hidden items-center justify-center p-6">
         <div class="data-card w-full max-w-lg p-8 rounded-3xl border border-cyan-500/30">
-            <h2 class="text-2xl font-black italic text-cyan-400 mb-6 uppercase tracking-tighter">Create Publication</h2>
+            <h2 class="text-2xl font-black italic text-cyan-400 mb-6 uppercase tracking-tighter">Academic Log</h2>
             <div class="space-y-4">
-                <input type="text" id="entryTitle" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none input-glow" placeholder="Subject line">
-                <textarea id="entryBody" rows="5" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none input-glow" placeholder="Detail parameters..."></textarea>
+                <input type="text" id="entryTitle" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none input-glow" placeholder="Subject / Topic">
+                <textarea id="entryBody" rows="5" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none input-glow" placeholder="Detail notes..."></textarea>
                 <div class="flex gap-4">
-                    <button onclick="closeEntryModal()" class="flex-1 py-3 rounded-xl border border-slate-800 font-bold text-xs uppercase tracking-widest hover:bg-slate-800">Discard</button>
+                    <button onclick="closeEntryModal()" class="flex-1 py-3 rounded-xl border border-slate-800 font-bold text-xs uppercase tracking-widest hover:bg-slate-800">Cancel</button>
                     <button onclick="publishEntry()" id="publishBtn" class="flex-1 py-3 rounded-xl bg-cyan-500 text-slate-950 font-black text-xs uppercase tracking-widest hover:bg-cyan-400 flex items-center justify-center gap-2">
-                        <span>Publish</span>
+                        <span>Sync</span>
                         <div id="publishLoader" class="spinner hidden" style="width:16px; height:16px;"></div>
                     </button>
                 </div>
@@ -230,14 +214,14 @@
         </div>
     </div>
 
-    <!-- PORTAL VIEWPORT (For tools) -->
+    <!-- PORTAL VIEWPORT -->
     <div id="portalViewport" class="fixed inset-0 bg-black z-[150] hidden flex-col">
         <div class="bg-slate-950 p-4 flex justify-between items-center border-b border-slate-900">
             <button onclick="closePortalModule()" class="flex items-center gap-2 text-slate-500 hover:text-white transition-colors">
                 <span class="text-xl">←</span>
-                <span class="font-bold uppercase text-[10px] tracking-widest">Return</span>
+                <span class="font-bold uppercase text-[10px] tracking-widest">Exit Module</span>
             </button>
-            <div id="viewportTitle" class="font-black italic text-cyan-400 tracking-tighter text-sm uppercase">MODULE</div>
+            <div id="viewportTitle" class="font-black italic text-cyan-400 tracking-tighter text-sm uppercase">PROCESSING...</div>
             <div class="w-10"></div>
         </div>
         <div class="flex-grow bg-slate-900">
@@ -245,13 +229,12 @@
         </div>
     </div>
 
-    <!-- FIREBASE INTEGRATION -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, collection, query, onSnapshot, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Environment Globals
+        // Configuration
         const firebaseConfig = JSON.parse(__firebase_config);
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'academic-portal-v1';
         
@@ -260,11 +243,9 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // State
         let currentUserData = null;
-        let isProvisionMode = false;
+        let isRegistrationMode = false;
 
-        // UI References
         const elements = {
             entryScreen: document.getElementById('entryScreen'),
             interface: document.getElementById('interface'),
@@ -275,22 +256,18 @@
             dataStream: document.getElementById('dataStreamContainer'),
             nodeDisplayUser: document.getElementById('nodeDisplayUser'),
             nodeInitial: document.getElementById('nodeInitial'),
-            managerTab: document.getElementById('managerTab')
+            managerTab: document.getElementById('managerTab'),
+            toggleBtn: document.getElementById('togglePortalModeBtn')
         };
 
-        // --- AUTH LOGIC ---
-
         const initSession = async () => {
-            // First, ensure we have an anonymous auth session for Firestore access
             await signInAnonymously(auth);
-
-            // Check if there is already a "logged in" user state in local storage
             const savedUser = localStorage.getItem('portal_user');
             if (savedUser) {
                 try {
                     const userData = JSON.parse(savedUser);
-                    // Verify if identity still exists in cloud
-                    const userRef = doc(db, 'artifacts', appId, 'public', 'data', 'identities', userData.username);
+                    // Standardize to lowercase for check
+                    const userRef = doc(db, 'artifacts', appId, 'public', 'data', 'identities', userData.username.toLowerCase());
                     const snap = await getDoc(userRef);
                     if (snap.exists()) {
                         loginSuccess(snap.data());
@@ -301,37 +278,34 @@
                     localStorage.removeItem('portal_user');
                 }
             }
-
-            onAuthStateChanged(auth, (user) => {
-                if (!user) console.warn("No valid secure session.");
-            });
         };
 
         window.togglePortalMode = () => {
-            isProvisionMode = !isProvisionMode;
-            document.getElementById('portalSubtitle').textContent = isProvisionMode ? "Credential Provisioning" : "Cloud Synchronization Active";
-            elements.btnText.textContent = isProvisionMode ? "Create Identity" : "Access Portal";
+            isRegistrationMode = !isRegistrationMode;
+            document.getElementById('portalSubtitle').textContent = isRegistrationMode ? "Registration Interface" : "Institutional Synchronization Active";
+            elements.btnText.textContent = isRegistrationMode ? "Create Researcher ID" : "Initialize Session";
+            elements.toggleBtn.textContent = isRegistrationMode ? "Back to Login" : "Don't have an ID? Register Here";
             elements.entryError.classList.add('hidden');
         };
 
         elements.entryForm.onsubmit = async (e) => {
             e.preventDefault();
             const id = document.getElementById('nodeUser').value.trim().toLowerCase();
-            const key = document.getElementById('nodeKey').value;
+            const key = document.getElementById('nodeKey').value.trim();
             
             if (!id || !key) return;
 
             elements.btnLoader.classList.remove('hidden');
             elements.btnText.style.opacity = '0.5';
+            elements.entryError.classList.add('hidden');
 
             try {
-                // Access rules: /artifacts/{appId}/public/data/identities/{id}
                 const userRef = doc(db, 'artifacts', appId, 'public', 'data', 'identities', id);
                 const userSnap = await getDoc(userRef);
 
-                if (isProvisionMode) {
+                if (isRegistrationMode) {
                     if (userSnap.exists()) {
-                        throw new Error("ID already registered in cloud.");
+                        throw new Error("ID ALREADY REGISTERED");
                     }
                     await setDoc(userRef, {
                         username: id,
@@ -339,13 +313,15 @@
                         level: id === 'admin' ? 'root' : 'base',
                         created: serverTimestamp()
                     });
-                    alert("Identity provisioned successfully. You can now login.");
+                    alert("ID Provisioned Successfully. You can now login.");
                     window.togglePortalMode();
                 } else {
-                    if (!userSnap.exists() || userSnap.data().key !== key) {
-                        throw new Error("Invalid ID or Key.");
+                    if (!userSnap.exists()) {
+                        throw new Error("ID NOT FOUND");
                     }
-                    // Success Login - Persist locally
+                    if (userSnap.data().key !== key) {
+                        throw new Error("ACCESS KEY DENIED");
+                    }
                     localStorage.setItem('portal_user', JSON.stringify(userSnap.data()));
                     loginSuccess(userSnap.data());
                 }
@@ -374,25 +350,20 @@
             startRealtimeFeed();
         };
 
-        // --- BLOG / FEED LOGIC ---
-
         const startRealtimeFeed = () => {
             const pubCol = collection(db, 'artifacts', appId, 'public', 'data', 'publications');
-            
             onSnapshot(pubCol, (snapshot) => {
                 const docs = [];
                 snapshot.forEach(d => docs.push({id: d.id, ...d.data()}));
                 docs.sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
                 renderFeed(docs);
-            }, (err) => {
-                console.error("Feed error:", err);
-            });
+            }, (err) => console.error(err));
         };
 
         const renderFeed = (docs) => {
             elements.dataStream.innerHTML = '';
             if (docs.length === 0) {
-                elements.dataStream.innerHTML = `<div class="text-center py-20 text-slate-600 italic">No publications in database.</div>`;
+                elements.dataStream.innerHTML = `<div class="text-center py-20 text-slate-600 italic">No collaborative data found.</div>`;
                 return;
             }
 
@@ -402,14 +373,14 @@
                 card.className = "data-card p-6 rounded-2xl border-l-4 border-cyan-500 animate-in fade-in slide-in-from-bottom-2 duration-500";
                 card.innerHTML = `
                     <div class="flex justify-between items-start mb-4">
-                        <span class="text-[10px] font-bold text-cyan-400 uppercase tracking-widest">PUBLICATION</span>
+                        <span class="text-[10px] font-bold text-cyan-400 uppercase tracking-widest">LOG_ENTRY</span>
                         <span class="text-[10px] text-slate-500">${dateStr}</span>
                     </div>
                     <h3 class="text-xl font-bold mb-2">${pub.title}</h3>
                     <p class="text-slate-400 text-sm leading-relaxed whitespace-pre-wrap">${pub.body}</p>
                     <div class="mt-4 pt-4 border-t border-slate-800 text-[10px] text-slate-500 italic flex justify-between">
-                        <span>Node: ${pub.author}</span>
-                        <span>Global ID: ${pub.id.substring(0,6)}</span>
+                        <span>Researcher: ${pub.author}</span>
+                        <span>Instance: ${pub.id.substring(0,6)}</span>
                     </div>
                 `;
                 elements.dataStream.appendChild(card);
@@ -437,14 +408,13 @@
                 document.getElementById('entryTitle').value = '';
                 document.getElementById('entryBody').value = '';
             } catch (err) {
-                alert("Cloud sync failed.");
+                alert("Cloud sync error.");
             } finally {
                 loader.classList.add('hidden');
                 btn.disabled = false;
             }
         };
 
-        // UI Helper Functions
         window.openEntryModal = () => { document.getElementById('entryModal').classList.remove('hidden'); document.getElementById('entryModal').classList.add('flex'); };
         window.closeEntryModal = () => { document.getElementById('entryModal').classList.add('hidden'); document.getElementById('entryModal').classList.remove('flex'); };
         window.showSection = (id) => {
@@ -459,7 +429,7 @@
             document.getElementById('viewportFrame').src = path;
             document.getElementById('portalViewport').classList.remove('hidden');
             document.getElementById('portalViewport').classList.add('flex');
-            document.getElementById('viewportTitle').textContent = path.split('.')[0].replace('_', ' ');
+            document.getElementById('viewportTitle').textContent = "PORTAL ACTIVE: " + path.toUpperCase();
         };
         window.closePortalModule = () => {
             document.getElementById('portalViewport').classList.add('hidden');
@@ -472,9 +442,7 @@
             location.reload();
         };
 
-        // Boot
         initSession();
-
     </script>
 </body>
 </html>
