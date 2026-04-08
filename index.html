@@ -42,8 +42,8 @@
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
         
-        .manager-only { display: none; }
-        body.is-manager .manager-only { display: block; }
+        .admin-only { display: none !important; }
+        body.is-manager .admin-only { display: block !important; }
 
         .spinner {
             border: 3px solid rgba(34, 211, 238, 0.1);
@@ -87,9 +87,6 @@
                 <button id="togglePortalModeBtn" onclick="togglePortalMode()" class="text-[10px] text-cyan-400 hover:text-cyan-300 uppercase font-bold tracking-widest transition-colors">
                     Don't have an ID? Register Here
                 </button>
-                <p class="text-center text-slate-600 text-[10px] leading-relaxed">
-                    Access governed by Educational Fair Use policies.<br>Encrypted via Secure Data Protocol.
-                </p>
             </div>
         </div>
     </div>
@@ -108,13 +105,7 @@
                 <div onclick="showSection('tools')" class="nav-item px-6 py-3 flex items-center gap-3 text-sm font-bold text-slate-400" data-tab="tools">
                     <span>🛠️</span> Compute Modules
                 </div>
-                <div onclick="showSection('media')" class="nav-item px-6 py-3 flex items-center gap-3 text-sm font-bold text-slate-400" data-tab="media">
-                    <span>📺</span> Lecture Library
-                </div>
-                <div onclick="showSection('saved')" class="nav-item px-6 py-3 flex items-center gap-3 text-sm font-bold text-slate-400" data-tab="saved">
-                    <span>⭐️</span> Citations
-                </div>
-                <div id="managerTab" onclick="showSection('manager')" class="nav-item px-6 py-3 items-center gap-3 text-sm font-bold text-rose-400 hidden" data-tab="manager">
+                <div id="managerTab" onclick="showSection('manager')" class="nav-item px-6 py-3 items-center gap-3 text-sm font-bold text-rose-400 admin-only" data-tab="manager">
                     <span>⚙️</span> Admin Console
                 </div>
             </nav>
@@ -126,7 +117,6 @@
                     </div>
                     <div class="overflow-hidden">
                         <p id="nodeDisplayUser" class="text-xs font-bold truncate text-slate-200">Researcher</p>
-                        <p class="text-[10px] text-slate-500 uppercase">Status: Connected</p>
                     </div>
                 </div>
                 <button onclick="terminateSession()" class="w-full py-2 border border-slate-800 rounded-lg text-[10px] uppercase font-bold text-slate-500 hover:bg-rose-500/10 hover:text-rose-500 transition-colors">
@@ -141,19 +131,13 @@
                 <header class="mb-8 flex justify-between items-end">
                     <div>
                         <h2 class="text-3xl font-black italic tracking-tight">DATA REPOSITORY</h2>
-                        <p class="text-slate-500 text-sm">Collaborative academic updates and study logs.</p>
+                        <p class="text-slate-500 text-sm">Institutional updates and academic logs.</p>
                     </div>
-                    <button onclick="openEntryModal()" class="bg-cyan-500 text-slate-950 px-4 py-2 rounded-lg font-bold text-xs uppercase tracking-widest hover:bg-cyan-400 transition-colors">
+                    <button onclick="openEntryModal()" class="bg-cyan-500 text-slate-950 px-4 py-2 rounded-lg font-bold text-xs uppercase tracking-widest hover:bg-cyan-400 transition-colors admin-only">
                         Post Log
                     </button>
                 </header>
-
-                <div id="dataStreamContainer" class="space-y-6">
-                    <div id="feedLoading" class="flex flex-col items-center justify-center py-20 opacity-50">
-                        <div class="spinner mb-4"></div>
-                        <p class="text-xs uppercase tracking-widest font-bold">Synchronizing Data...</p>
-                    </div>
-                </div>
+                <div id="dataStreamContainer" class="space-y-6"></div>
             </section>
             
             <section id="tab-tools" class="tab-content hidden">
@@ -162,287 +146,162 @@
                     <p class="text-slate-500 text-sm">Interactive educational simulations and logic modules.</p>
                 </header>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <div onclick="initModule('snake_game.html')" class="data-card rounded-2xl p-5 cursor-pointer group">
+                    <div onclick="initModule('Snake.html')" class="data-card rounded-2xl p-5 cursor-pointer group">
                         <div class="h-32 bg-emerald-900/20 rounded-xl mb-4 flex items-center justify-center relative overflow-hidden">
-                            <span class="text-4xl group-hover:scale-110 transition-transform">📊</span>
+                            <span class="text-4xl group-hover:scale-110 transition-transform">🐍</span>
                         </div>
-                        <h3 class="font-bold">Math: Optimization</h3>
+                        <h3 class="font-bold">Logic: Recursive Growth</h3>
                         <div class="flex justify-between items-center mt-2">
-                            <span class="text-[10px] font-bold text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded">ALGORITHM</span>
-                            <span class="text-[10px] text-slate-500">Node: Local</span>
+                            <span class="text-[10px] font-bold text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded">NEON_SNAKE</span>
+                            <span class="text-[10px] text-slate-500">Node: Verified</span>
                         </div>
                     </div>
-                    <!-- Future tools can be added here -->
                 </div>
             </section>
 
             <section id="tab-manager" class="tab-content hidden">
-                <header class="mb-8 p-6 bg-rose-500/10 border border-rose-500/20 rounded-2xl">
-                    <h2 class="text-2xl font-black text-rose-500 italic">SYSTEM OVERRIDE</h2>
-                    <p class="text-rose-400/60 text-sm">Global synchronization and database management.</p>
-                </header>
-                <div id="managerContent" class="text-slate-500 italic text-sm">Updating cloud records...</div>
-            </section>
-
-            <section id="tab-media" class="tab-content hidden pt-20 text-center">
-                <span class="text-6xl mb-4 block">📺</span>
-                <p class="text-slate-500">Video server offline.</p>
-            </section>
-            
-            <section id="tab-saved" class="tab-content hidden pt-20 text-center">
-                <span class="text-6xl mb-4 block">📑</span>
-                <p class="text-slate-500">No saved citations.</p>
+                <h2 class="text-2xl font-black text-rose-500 italic">ADMIN OVERRIDE</h2>
             </section>
         </main>
     </div>
 
-    <!-- PUBLISH MODAL -->
-    <div id="entryModal" class="fixed inset-0 z-[200] bg-black/80 backdrop-blur-md hidden items-center justify-center p-6">
-        <div class="data-card w-full max-w-lg p-8 rounded-3xl border border-cyan-500/30">
-            <h2 class="text-2xl font-black italic text-cyan-400 mb-6 uppercase tracking-tighter">Academic Log</h2>
-            <div class="space-y-4">
-                <input type="text" id="entryTitle" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none input-glow" placeholder="Subject / Topic">
-                <textarea id="entryBody" rows="5" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none input-glow" placeholder="Detail notes..."></textarea>
-                <div class="flex gap-4">
-                    <button onclick="closeEntryModal()" class="flex-1 py-3 rounded-xl border border-slate-800 font-bold text-xs uppercase tracking-widest hover:bg-slate-800">Cancel</button>
-                    <button onclick="publishEntry()" id="publishBtn" class="flex-1 py-3 rounded-xl bg-cyan-500 text-slate-950 font-black text-xs uppercase tracking-widest hover:bg-cyan-400 flex items-center justify-center gap-2">
-                        <span>Sync</span>
-                        <div id="publishLoader" class="spinner hidden" style="width:16px; height:16px;"></div>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- PORTAL VIEWPORT -->
+    <!-- VIEWPORT FOR MODULES -->
     <div id="portalViewport" class="fixed inset-0 bg-black z-[150] hidden flex-col">
         <div class="bg-slate-950 p-4 flex justify-between items-center border-b border-slate-900">
-            <button onclick="closePortalModule()" class="flex items-center gap-2 text-slate-500 hover:text-white transition-colors">
-                <span class="text-xl">←</span>
-                <span class="font-bold uppercase text-[10px] tracking-widest">Exit Module</span>
+            <button onclick="closePortalModule()" class="text-slate-500 hover:text-white font-bold uppercase text-[10px] tracking-widest flex items-center gap-2">
+                <span>←</span> Exit Simulation
             </button>
-            <div id="viewportTitle" class="font-black italic text-cyan-400 tracking-tighter text-sm uppercase">PROCESSING...</div>
-            <div class="w-10"></div>
+            <div id="viewportTitle" class="font-black italic text-cyan-400 tracking-tighter text-sm">INITIALIZING...</div>
+            <div class="w-20"></div>
         </div>
         <div class="flex-grow bg-slate-900">
             <iframe id="viewportFrame" src="" class="w-full h-full border-none"></iframe>
         </div>
     </div>
 
+    <!-- PUBLISH MODAL -->
+    <div id="entryModal" class="fixed inset-0 z-[200] bg-black/80 backdrop-blur-md hidden items-center justify-center p-6">
+        <div class="data-card w-full max-w-lg p-8 rounded-3xl border border-cyan-500/30">
+            <h2 class="text-2xl font-black italic text-cyan-400 mb-6 uppercase tracking-tighter">Broadcast Log</h2>
+            <div class="space-y-4">
+                <input type="text" id="entryTitle" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none" placeholder="Subject">
+                <textarea id="entryBody" rows="5" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none" placeholder="Notes..."></textarea>
+                <div class="flex gap-4">
+                    <button onclick="closeEntryModal()" class="flex-1 py-3 rounded-xl border border-slate-800 font-bold text-xs uppercase">Cancel</button>
+                    <button onclick="publishEntry()" id="publishBtn" class="flex-1 py-3 rounded-xl bg-cyan-500 text-slate-950 font-black text-xs uppercase">Sync</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, collection, query, onSnapshot, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Configuration
         const firebaseConfig = JSON.parse(__firebase_config);
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'academic-portal-v1';
-        
-        // Initialize
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
         let currentUserData = null;
         let isRegistrationMode = false;
+        let authSession = null;
 
-        const elements = {
-            entryScreen: document.getElementById('entryScreen'),
-            interface: document.getElementById('interface'),
-            entryForm: document.getElementById('entryForm'),
-            entryError: document.getElementById('entryError'),
-            btnText: document.getElementById('btnText'),
-            btnLoader: document.getElementById('btnLoader'),
-            dataStream: document.getElementById('dataStreamContainer'),
-            nodeDisplayUser: document.getElementById('nodeDisplayUser'),
-            nodeInitial: document.getElementById('nodeInitial'),
-            managerTab: document.getElementById('managerTab'),
-            toggleBtn: document.getElementById('togglePortalModeBtn')
-        };
+        const getIdentityRef = (id) => doc(db, 'artifacts', appId, 'public', 'data', 'identities', id.toLowerCase());
 
-        const initSession = async () => {
-            await signInAnonymously(auth);
-            const savedUser = localStorage.getItem('portal_user');
-            if (savedUser) {
-                try {
-                    const userData = JSON.parse(savedUser);
-                    // Standardize to lowercase for check
-                    const userRef = doc(db, 'artifacts', appId, 'public', 'data', 'identities', userData.username.toLowerCase());
-                    const snap = await getDoc(userRef);
-                    if (snap.exists()) {
-                        loginSuccess(snap.data());
-                    } else {
-                        localStorage.removeItem('portal_user');
-                    }
-                } catch (e) {
-                    localStorage.removeItem('portal_user');
+        onAuthStateChanged(auth, async (user) => {
+            authSession = user;
+            if (user) {
+                const savedId = localStorage.getItem('portal_user_identity');
+                if (savedId) {
+                    const snap = await getDoc(getIdentityRef(savedId));
+                    if (snap.exists()) loginSuccess(snap.data());
                 }
             }
-        };
+        });
+
+        signInAnonymously(auth);
 
         window.togglePortalMode = () => {
             isRegistrationMode = !isRegistrationMode;
             document.getElementById('portalSubtitle').textContent = isRegistrationMode ? "Registration Interface" : "Institutional Synchronization Active";
-            elements.btnText.textContent = isRegistrationMode ? "Create Researcher ID" : "Initialize Session";
-            elements.toggleBtn.textContent = isRegistrationMode ? "Back to Login" : "Don't have an ID? Register Here";
-            elements.entryError.classList.add('hidden');
         };
 
-        elements.entryForm.onsubmit = async (e) => {
+        document.getElementById('entryForm').onsubmit = async (e) => {
             e.preventDefault();
-            const id = document.getElementById('nodeUser').value.trim().toLowerCase();
+            const id = document.getElementById('nodeUser').value.trim();
             const key = document.getElementById('nodeKey').value.trim();
             
-            if (!id || !key) return;
-
-            elements.btnLoader.classList.remove('hidden');
-            elements.btnText.style.opacity = '0.5';
-            elements.entryError.classList.add('hidden');
-
             try {
-                const userRef = doc(db, 'artifacts', appId, 'public', 'data', 'identities', id);
+                const userRef = getIdentityRef(id);
                 const userSnap = await getDoc(userRef);
 
                 if (isRegistrationMode) {
-                    if (userSnap.exists()) {
-                        throw new Error("ID ALREADY REGISTERED");
-                    }
-                    await setDoc(userRef, {
-                        username: id,
-                        key: key, 
-                        level: id === 'admin' ? 'root' : 'base',
-                        created: serverTimestamp()
-                    });
-                    alert("ID Provisioned Successfully. You can now login.");
+                    if (userSnap.exists()) throw new Error("ID TAKEN");
+                    const data = { username: id, key: key, level: id.toLowerCase() === 'admin' ? 'root' : 'base' };
+                    await setDoc(userRef, data);
+                    alert("Account Created.");
                     window.togglePortalMode();
                 } else {
-                    if (!userSnap.exists()) {
-                        throw new Error("ID NOT FOUND");
-                    }
-                    if (userSnap.data().key !== key) {
-                        throw new Error("ACCESS KEY DENIED");
-                    }
-                    localStorage.setItem('portal_user', JSON.stringify(userSnap.data()));
+                    if (!userSnap.exists() || userSnap.data().key !== key) throw new Error("ACCESS DENIED");
+                    localStorage.setItem('portal_user_identity', id);
                     loginSuccess(userSnap.data());
                 }
-            } catch (err) {
-                elements.entryError.textContent = err.message;
-                elements.entryError.classList.remove('hidden');
-            } finally {
-                elements.btnLoader.classList.add('hidden');
-                elements.btnText.style.opacity = '1';
-            }
+            } catch (err) { alert(err.message); }
         };
 
         const loginSuccess = (data) => {
             currentUserData = data;
-            elements.entryScreen.classList.add('hidden');
-            elements.interface.classList.remove('hidden');
-            elements.nodeDisplayUser.textContent = data.username;
-            elements.nodeInitial.textContent = data.username.charAt(0).toUpperCase();
-            
-            if (data.level === 'root') {
-                document.body.classList.add('is-manager');
-                elements.managerTab.classList.remove('hidden');
-                elements.managerTab.classList.add('flex');
-            }
-
-            startRealtimeFeed();
+            document.getElementById('entryScreen').classList.add('hidden');
+            document.getElementById('interface').classList.remove('hidden');
+            document.getElementById('nodeDisplayUser').textContent = data.username;
+            document.getElementById('nodeInitial').textContent = data.username.charAt(0).toUpperCase();
+            if (data.level === 'root') document.body.classList.add('is-manager');
+            startFeed();
         };
 
-        const startRealtimeFeed = () => {
-            const pubCol = collection(db, 'artifacts', appId, 'public', 'data', 'publications');
-            onSnapshot(pubCol, (snapshot) => {
-                const docs = [];
-                snapshot.forEach(d => docs.push({id: d.id, ...d.data()}));
-                docs.sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
-                renderFeed(docs);
-            }, (err) => console.error(err));
-        };
-
-        const renderFeed = (docs) => {
-            elements.dataStream.innerHTML = '';
-            if (docs.length === 0) {
-                elements.dataStream.innerHTML = `<div class="text-center py-20 text-slate-600 italic">No collaborative data found.</div>`;
-                return;
-            }
-
-            docs.forEach(pub => {
-                const dateStr = pub.timestamp ? new Date(pub.timestamp.seconds * 1000).toLocaleDateString() : 'Syncing...';
-                const card = document.createElement('div');
-                card.className = "data-card p-6 rounded-2xl border-l-4 border-cyan-500 animate-in fade-in slide-in-from-bottom-2 duration-500";
-                card.innerHTML = `
-                    <div class="flex justify-between items-start mb-4">
-                        <span class="text-[10px] font-bold text-cyan-400 uppercase tracking-widest">LOG_ENTRY</span>
-                        <span class="text-[10px] text-slate-500">${dateStr}</span>
-                    </div>
-                    <h3 class="text-xl font-bold mb-2">${pub.title}</h3>
-                    <p class="text-slate-400 text-sm leading-relaxed whitespace-pre-wrap">${pub.body}</p>
-                    <div class="mt-4 pt-4 border-t border-slate-800 text-[10px] text-slate-500 italic flex justify-between">
-                        <span>Researcher: ${pub.author}</span>
-                        <span>Instance: ${pub.id.substring(0,6)}</span>
-                    </div>
-                `;
-                elements.dataStream.appendChild(card);
+        const startFeed = () => {
+            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'publications'), (snap) => {
+                const container = document.getElementById('dataStreamContainer');
+                container.innerHTML = '';
+                snap.forEach(d => {
+                    const p = d.data();
+                    container.innerHTML += `<div class="data-card p-6 rounded-2xl border-l-4 border-cyan-500 mb-4">
+                        <h3 class="font-bold text-xl">${p.title}</h3>
+                        <p class="text-slate-400 text-sm mt-2">${p.body}</p>
+                        <div class="mt-4 text-[10px] text-slate-500 uppercase">Author: ${p.author}</div>
+                    </div>`;
+                });
             });
         };
 
         window.publishEntry = async () => {
-            const t = document.getElementById('entryTitle').value.trim();
-            const b = document.getElementById('entryBody').value.trim();
-            if (!t || !b) return;
-
-            const loader = document.getElementById('publishLoader');
-            const btn = document.getElementById('publishBtn');
-            loader.classList.remove('hidden');
-            btn.disabled = true;
-
-            try {
-                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'publications'), {
-                    title: t,
-                    body: b,
-                    author: currentUserData.username,
-                    timestamp: serverTimestamp()
-                });
-                window.closeEntryModal();
-                document.getElementById('entryTitle').value = '';
-                document.getElementById('entryBody').value = '';
-            } catch (err) {
-                alert("Cloud sync error.");
-            } finally {
-                loader.classList.add('hidden');
-                btn.disabled = false;
-            }
-        };
-
-        window.openEntryModal = () => { document.getElementById('entryModal').classList.remove('hidden'); document.getElementById('entryModal').classList.add('flex'); };
-        window.closeEntryModal = () => { document.getElementById('entryModal').classList.add('hidden'); document.getElementById('entryModal').classList.remove('flex'); };
-        window.showSection = (id) => {
-            document.querySelectorAll('.nav-item').forEach(e => {
-                e.classList.remove('active');
-                if (e.getAttribute('data-tab') === id) e.classList.add('active');
+            if (currentUserData.level !== 'root') return alert("Admin Only");
+            await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'publications'), {
+                title: document.getElementById('entryTitle').value,
+                body: document.getElementById('entryBody').value,
+                author: currentUserData.username,
+                timestamp: serverTimestamp()
             });
-            document.querySelectorAll('.tab-content').forEach(e => e.classList.add('hidden'));
-            document.getElementById(`tab-${id}`).classList.remove('hidden');
+            window.closeEntryModal();
         };
+
         window.initModule = (path) => {
             document.getElementById('viewportFrame').src = path;
             document.getElementById('portalViewport').classList.remove('hidden');
             document.getElementById('portalViewport').classList.add('flex');
-            document.getElementById('viewportTitle').textContent = "PORTAL ACTIVE: " + path.toUpperCase();
+            document.getElementById('viewportTitle').textContent = "SIMULATION: " + path.toUpperCase();
         };
-        window.closePortalModule = () => {
-            document.getElementById('portalViewport').classList.add('hidden');
-            document.getElementById('viewportFrame').src = "";
+        window.closePortalModule = () => { document.getElementById('portalViewport').classList.add('hidden'); };
+        window.showSection = (id) => {
+            document.querySelectorAll('.tab-content').forEach(e => e.classList.add('hidden'));
+            document.getElementById(`tab-${id}`).classList.remove('hidden');
         };
-        
-        window.terminateSession = async () => {
-            localStorage.removeItem('portal_user');
-            await signOut(auth);
-            location.reload();
-        };
-
-        initSession();
+        window.openEntryModal = () => document.getElementById('entryModal').classList.remove('hidden');
+        window.closeEntryModal = () => document.getElementById('entryModal').classList.add('hidden');
+        window.terminateSession = () => { localStorage.clear(); location.reload(); };
     </script>
 </body>
 </html>
