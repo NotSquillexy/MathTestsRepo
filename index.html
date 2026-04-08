@@ -44,6 +44,17 @@
         
         .manager-only { display: none; }
         body.is-manager .manager-only { display: block; }
+
+        /* Loading Spinner */
+        .spinner {
+            border: 3px solid rgba(34, 211, 238, 0.1);
+            border-top: 3px solid #22d3ee;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body class="font-sans">
@@ -53,7 +64,7 @@
         <div class="w-full max-w-md data-card p-8 rounded-3xl border border-white/10 shadow-2xl">
             <div class="text-center mb-8">
                 <h1 class="text-3xl font-black italic tracking-tighter text-cyan-400">RESOURCE PORTAL</h1>
-                <p id="portalSubtitle" class="text-slate-500 text-xs uppercase tracking-[0.2em] mt-1">Verification Required</p>
+                <p id="portalSubtitle" class="text-slate-500 text-xs uppercase tracking-[0.2em] mt-1">Cloud Synchronization Active</p>
             </div>
             
             <form id="entryForm" class="space-y-4">
@@ -67,8 +78,9 @@
                 </div>
                 <div id="entryError" class="text-rose-500 text-xs hidden text-center font-bold">Verification failed. Access restricted.</div>
                 
-                <button type="submit" id="portalSubmitBtn" class="w-full bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-black py-3 rounded-xl transition-all transform active:scale-95 uppercase tracking-widest text-sm mt-2">
-                    Access Portal
+                <button type="submit" id="portalSubmitBtn" class="w-full bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-black py-3 rounded-xl transition-all transform active:scale-95 uppercase tracking-widest text-sm mt-2 flex items-center justify-center gap-2">
+                    <span id="btnText">Access Portal</span>
+                    <div id="btnLoader" class="spinner hidden"></div>
                 </button>
             </form>
             
@@ -76,11 +88,8 @@
                 <button id="togglePortalModeBtn" onclick="togglePortalMode()" class="text-[10px] text-cyan-400 hover:underline uppercase font-bold tracking-widest transition-colors">
                     Request Credentials
                 </button>
-                <button onclick="requestKeyRecovery()" class="text-[10px] text-slate-500 hover:text-cyan-400 uppercase font-bold tracking-widest transition-colors">
-                    Key Recovery?
-                </button>
                 <p class="text-center text-slate-600 text-[10px] leading-relaxed">
-                    Protected by Secure Data Protocol.<br>Activity is logged for compliance.
+                    Protected by Secure Data Protocol.<br>Activity is logged to Central Database.
                 </p>
             </div>
         </div>
@@ -88,8 +97,7 @@
 
     <!-- MAIN INTERFACE -->
     <div id="interface" class="hidden flex h-screen w-full">
-        
-        <!-- NAVIGATION -->
+        <!-- SIDE NAVIGATION -->
         <aside class="w-64 bg-slate-950 border-r border-slate-900 flex flex-col">
             <div class="p-6 border-b border-slate-900">
                 <h2 class="text-xl font-black italic text-cyan-400 tracking-tighter">RESOURCE PORTAL</h2>
@@ -120,7 +128,7 @@
                     </div>
                     <div class="overflow-hidden">
                         <p id="nodeDisplayUser" class="text-xs font-bold truncate text-slate-200">User</p>
-                        <p class="text-[10px] text-slate-500 uppercase">Authenticated</p>
+                        <p class="text-[10px] text-slate-500 uppercase">Cloud Linked</p>
                     </div>
                 </div>
                 <button onclick="terminateSession()" class="w-full py-2 border border-slate-800 rounded-lg text-[10px] uppercase font-bold text-slate-500 hover:bg-rose-500/10 hover:text-rose-500 transition-colors">
@@ -132,25 +140,28 @@
         <!-- CONTENT AREA -->
         <main class="flex-grow overflow-y-auto p-8 relative">
             
-            <!-- PUBLICATIONS TAB -->
+            <!-- PUBLICATIONS TAB (The Blog) -->
             <section id="tab-docs" class="tab-content max-w-4xl mx-auto">
                 <header class="mb-8 flex justify-between items-end">
                     <div>
                         <h2 class="text-3xl font-black italic tracking-tight">DATA FEED</h2>
-                        <p class="text-slate-500 text-sm">Latest publications and technical reports.</p>
+                        <p class="text-slate-500 text-sm">Real-time publications from the academic network.</p>
                     </div>
-                    <!-- Manager Only Button -->
-                    <button onclick="openEntryModal()" class="manager-only bg-cyan-500 text-slate-950 px-4 py-2 rounded-lg font-bold text-xs uppercase tracking-widest hover:bg-cyan-400 transition-colors">
+                    <button onclick="openEntryModal()" class="bg-cyan-500 text-slate-950 px-4 py-2 rounded-lg font-bold text-xs uppercase tracking-widest hover:bg-cyan-400 transition-colors">
                         New Publication
                     </button>
                 </header>
 
                 <div id="dataStreamContainer" class="space-y-6">
-                    <!-- Dynamic content will be injected here -->
+                    <!-- Loading State -->
+                    <div id="feedLoading" class="flex flex-col items-center justify-center py-20 opacity-50">
+                        <div class="spinner mb-4"></div>
+                        <p class="text-xs uppercase tracking-widest font-bold">Syncing Data Feed...</p>
+                    </div>
                 </div>
             </section>
             
-            <!-- TOOLS TAB -->
+            <!-- Other sections remain same structure, hidden until selected -->
             <section id="tab-tools" class="tab-content hidden">
                 <header class="mb-8">
                     <h2 class="text-3xl font-black italic tracking-tight">TOOLSET REPOSITORY</h2>
@@ -180,338 +191,268 @@
                 </div>
             </section>
 
-            <!-- SYSTEM CONFIG PANEL -->
+            <!-- SYSTEM CONFIG PANEL (Root only) -->
             <section id="tab-manager" class="tab-content hidden">
                 <header class="mb-8 p-6 bg-rose-500/10 border border-rose-500/20 rounded-2xl">
                     <h2 class="text-2xl font-black text-rose-500 italic">SYSTEM OVERRIDE: MANAGEMENT</h2>
-                    <p class="text-rose-400/60 text-sm">Control console for infrastructure and audit logs.</p>
+                    <p class="text-rose-400/60 text-sm">User synchronization and global audit logs.</p>
                 </header>
-                
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    <!-- Identity Management -->
-                    <div class="lg:col-span-2 space-y-6">
-                        <div class="data-card rounded-2xl p-6">
-                            <h3 class="text-sm font-bold uppercase tracking-widest mb-6 text-slate-400 border-b border-slate-800 pb-2">User Registry</h3>
-                            <div class="overflow-x-auto">
-                                <table class="w-full text-left text-xs">
-                                    <thead>
-                                        <tr class="text-slate-500 border-b border-slate-800">
-                                            <th class="pb-3 px-2">ID</th>
-                                            <th class="pb-3 px-2">PRIVILEGE</th>
-                                            <th class="pb-3 px-2">STATE</th>
-                                            <th class="pb-3 px-2 text-right">ACTION</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="managerUserList">
-                                        <!-- Built dynamically -->
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Audit Logs -->
-                    <div class="space-y-6">
-                        <div class="data-card rounded-2xl p-6 bg-black/40">
-                            <h3 class="text-sm font-bold uppercase tracking-widest mb-4 text-slate-400">Audit Stream</h3>
-                            <div id="managerAuditLog" class="space-y-3 max-h-96 overflow-y-auto pr-2">
-                                <div class="text-[10px] p-2 rounded bg-slate-900 border border-slate-800 text-slate-500">
-                                    <span class="text-cyan-400 font-bold">[NET]</span> Link established...
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <div id="managerContent" class="text-slate-500 italic text-sm">Synchronizing user cloud records...</div>
             </section>
 
-            <!-- MEDIA TABS -->
-            <section id="tab-media" class="tab-content hidden text-center pt-20">
+            <section id="tab-media" class="tab-content hidden pt-20 text-center">
                 <span class="text-6xl mb-4 block">📺</span>
-                <h2 class="text-2xl font-bold">Lecture Library</h2>
-                <p class="text-slate-500">Media stream is currently pending update.</p>
+                <p class="text-slate-500">Media stream offline.</p>
             </section>
-            <section id="tab-saved" class="tab-content hidden text-center pt-20">
+            
+            <section id="tab-saved" class="tab-content hidden pt-20 text-center">
                 <span class="text-6xl mb-4 block">⭐️</span>
-                <h2 class="text-2xl font-bold">Saved Resources</h2>
-                <p class="text-slate-500">Cached materials will appear here.</p>
+                <p class="text-slate-500">No cached items.</p>
             </section>
         </main>
     </div>
 
-    <!-- MODALS -->
-    <!-- Entry Modal -->
+    <!-- PUBLISH MODAL -->
     <div id="entryModal" class="fixed inset-0 z-[200] bg-black/80 backdrop-blur-md hidden items-center justify-center p-6">
         <div class="data-card w-full max-w-lg p-8 rounded-3xl border border-cyan-500/30">
-            <h2 class="text-2xl font-black italic text-cyan-400 mb-6">PUBLISH CONTENT</h2>
+            <h2 class="text-2xl font-black italic text-cyan-400 mb-6 uppercase tracking-tighter">Create Publication</h2>
             <div class="space-y-4">
                 <input type="text" id="entryTitle" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none input-glow" placeholder="Subject line">
-                <textarea id="entryBody" rows="5" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none input-glow" placeholder="Input details..."></textarea>
+                <textarea id="entryBody" rows="5" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none input-glow" placeholder="Detail parameters..."></textarea>
                 <div class="flex gap-4">
                     <button onclick="closeEntryModal()" class="flex-1 py-3 rounded-xl border border-slate-800 font-bold text-xs uppercase tracking-widest hover:bg-slate-800">Discard</button>
-                    <button onclick="publishEntry()" class="flex-1 py-3 rounded-xl bg-cyan-500 text-slate-950 font-black text-xs uppercase tracking-widest hover:bg-cyan-400">Confirm</button>
+                    <button onclick="publishEntry()" id="publishBtn" class="flex-1 py-3 rounded-xl bg-cyan-500 text-slate-950 font-black text-xs uppercase tracking-widest hover:bg-cyan-400 flex items-center justify-center gap-2">
+                        <span>Publish</span>
+                        <div id="publishLoader" class="spinner hidden" style="width:16px; height:16px;"></div>
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- PORTAL VIEWPORT -->
+    <!-- PORTAL VIEWPORT (For tools) -->
     <div id="portalViewport" class="fixed inset-0 bg-black z-[150] hidden flex-col">
         <div class="bg-slate-950 p-4 flex justify-between items-center border-b border-slate-900">
             <button onclick="closePortalModule()" class="flex items-center gap-2 text-slate-500 hover:text-white transition-colors">
                 <span class="text-xl">←</span>
-                <span class="font-bold uppercase text-[10px] tracking-widest">Return to Dashboard</span>
+                <span class="font-bold uppercase text-[10px] tracking-widest">Return</span>
             </button>
-            <div id="viewportTitle" class="font-black italic text-cyan-400 tracking-tighter text-sm uppercase">MODULE_PATH</div>
-            <button onclick="refreshModule()" class="text-slate-500 hover:text-white">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"></path><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
-            </button>
+            <div id="viewportTitle" class="font-black italic text-cyan-400 tracking-tighter text-sm uppercase">MODULE</div>
+            <div class="w-10"></div>
         </div>
-        <div class="flex-grow relative bg-slate-900">
+        <div class="flex-grow bg-slate-900">
             <iframe id="viewportFrame" src="" class="w-full h-full border-none"></iframe>
         </div>
     </div>
 
-    <script>
-        const entryScreen = document.getElementById('entryScreen');
-        const interfaceEl = document.getElementById('interface');
-        const entryForm = document.getElementById('entryForm');
-        const entryError = document.getElementById('entryError');
-        const nodeDisplayUser = document.getElementById('nodeDisplayUser');
-        const nodeInitial = document.getElementById('nodeInitial');
-        const managerTab = document.getElementById('managerTab');
-        const portalViewport = document.getElementById('portalViewport');
-        const viewportFrame = document.getElementById('viewportFrame');
-        const viewportTitle = document.getElementById('viewportTitle');
-        const entryModal = document.getElementById('entryModal');
-        const managerAuditLog = document.getElementById('managerAuditLog');
-        const managerUserList = document.getElementById('managerUserList');
-        const togglePortalModeBtn = document.getElementById('togglePortalModeBtn');
-        const portalSubmitBtn = document.getElementById('portalSubmitBtn');
-        const portalSubtitle = document.getElementById('portalSubtitle');
-        const dataStreamContainer = document.getElementById('dataStreamContainer');
+    <!-- FIREBASE INTEGRATION -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, query, onSnapshot, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        let sessionActiveUser = null;
+        // Environment Globals
+        const firebaseConfig = JSON.parse(__firebase_config);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'academic-portal-v1';
+        
+        // Initialize
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // State
+        let currentUserData = null;
         let isProvisionMode = false;
 
-        // Default local data if empty
-        const INITIAL_DOCS = [
-            { id: 1, title: "System Performance Baseline", body: "System parameters have been adjusted for optimal throughput. Review local documentation for detail.", date: "April 7, 2026", author: "Management" }
-        ];
+        // UI References
+        const elements = {
+            entryScreen: document.getElementById('entryScreen'),
+            interface: document.getElementById('interface'),
+            entryForm: document.getElementById('entryForm'),
+            entryError: document.getElementById('entryError'),
+            btnText: document.getElementById('btnText'),
+            btnLoader: document.getElementById('btnLoader'),
+            dataStream: document.getElementById('dataStreamContainer'),
+            nodeDisplayUser: document.getElementById('nodeDisplayUser'),
+            nodeInitial: document.getElementById('nodeInitial'),
+            managerTab: document.getElementById('managerTab')
+        };
 
-        function fetchNodes() { return JSON.parse(localStorage.getItem('portal_nodes') || '{}'); }
-        function commitNode(name, secret) {
-            const nodes = fetchNodes();
-            nodes[name.toLowerCase()] = { name, secret, level: 'base', status: 'online' };
-            localStorage.setItem('portal_nodes', JSON.stringify(nodes));
-        }
+        // --- AUTH LOGIC ---
 
-        function fetchDocs() { return JSON.parse(localStorage.getItem('portal_docs') || JSON.stringify(INITIAL_DOCS)); }
-        function renderDocs() {
-            const docs = fetchDocs();
-            dataStreamContainer.innerHTML = '';
-            docs.forEach(doc => {
-                const block = document.createElement('div');
-                block.className = "data-card p-6 rounded-2xl border-l-4 border-cyan-500";
-                block.innerHTML = `
-                    <div class="flex justify-between items-start mb-4">
-                        <span class="text-[10px] font-bold text-cyan-400 uppercase tracking-widest">Publication #${doc.id}</span>
-                        <span class="text-[10px] text-slate-500">${doc.date}</span>
-                    </div>
-                    <h3 class="text-xl font-bold mb-2">${doc.title}</h3>
-                    <p class="text-slate-400 text-sm leading-relaxed">${doc.body}</p>
-                    <div class="mt-4 pt-4 border-t border-slate-800 text-[10px] text-slate-500 italic">Authored by ${doc.author}</div>
-                `;
-                dataStreamContainer.prepend(block);
+        const initSession = async () => {
+            await signInAnonymously(auth);
+            onAuthStateChanged(auth, (user) => {
+                if (!user) console.warn("No valid session.");
             });
-        }
+        };
 
-        function togglePortalMode() {
+        window.togglePortalMode = () => {
             isProvisionMode = !isProvisionMode;
-            if (isProvisionMode) {
-                portalSubtitle.textContent = "Credential Provisioning";
-                portalSubmitBtn.textContent = "Submit Request";
-                togglePortalModeBtn.textContent = "Return to Verification";
-            } else {
-                portalSubtitle.textContent = "Verification Required";
-                portalSubmitBtn.textContent = "Access Portal";
-                togglePortalModeBtn.textContent = "Request Credentials";
-            }
-            entryError.classList.add('hidden');
-        }
+            document.getElementById('portalSubtitle').textContent = isProvisionMode ? "Credential Provisioning" : "Cloud Synchronization Active";
+            elements.btnText.textContent = isProvisionMode ? "Create Identity" : "Access Portal";
+            elements.entryError.classList.add('hidden');
+        };
 
-        async function verifyIdentity(user, key) {
-            const lowerUser = user.toLowerCase();
-            const blacklist = JSON.parse(localStorage.getItem('access_blacklist') || '[]');
-            if (blacklist.includes(lowerUser)) return { success: false, reason: 'halt' };
-            if (lowerUser === 'admin' && key === 'SecretKey1') return { success: true, level: 'root' };
-            const nodes = fetchNodes();
-            if (nodes[lowerUser] && nodes[lowerUser].secret === key) return { success: true, level: nodes[lowerUser].level };
-            return { success: false, reason: 'reject' };
-        }
-
-        entryForm.onsubmit = async (e) => {
+        elements.entryForm.onsubmit = async (e) => {
             e.preventDefault();
-            const userVal = document.getElementById('nodeUser').value.trim();
-            const keyVal = document.getElementById('nodeKey').value;
+            const id = document.getElementById('nodeUser').value.trim().toLowerCase();
+            const key = document.getElementById('nodeKey').value;
+            
+            if (!id || !key) return;
 
-            if (isProvisionMode) {
-                if (userVal.length < 3 || keyVal.length < 4) {
-                    entryError.textContent = "Input length insufficient.";
-                    entryError.classList.remove('hidden');
-                    return;
-                }
-                const nodes = fetchNodes();
-                if (nodes[userVal.toLowerCase()] || userVal.toLowerCase() === 'admin') {
-                    entryError.textContent = "ID already registered.";
-                    entryError.classList.remove('hidden');
-                    return;
-                }
-                commitNode(userVal, keyVal);
-                alert("Identity confirmed. Please verify.");
-                togglePortalMode();
-                return;
-            }
+            elements.btnLoader.classList.remove('hidden');
+            elements.btnText.style.opacity = '0.5';
 
-            const validation = await verifyIdentity(userVal, keyVal);
-            if (validation.success) {
-                sessionActiveUser = { id: userVal, level: validation.level };
-                entryScreen.classList.add('hidden');
-                interfaceEl.classList.remove('hidden');
-                nodeDisplayUser.textContent = userVal;
-                nodeInitial.textContent = userVal.charAt(0).toUpperCase();
-                
-                if (validation.level === 'root') {
-                    document.body.classList.add('is-manager');
-                    managerTab.classList.remove('hidden');
-                    managerTab.classList.add('flex');
-                    addAudit('Level: Root authorization acknowledged.');
-                    syncUserRegistry();
+            try {
+                // Access rules: /artifacts/{appId}/public/data/identities/{id}
+                const userRef = doc(db, 'artifacts', appId, 'public', 'data', 'identities', id);
+                const userSnap = await getDoc(userRef);
+
+                if (isProvisionMode) {
+                    if (userSnap.exists()) {
+                        throw new Error("ID already registered in cloud.");
+                    }
+                    await setDoc(userRef, {
+                        username: id,
+                        key: key, // In a real production app, we would hash this, but for this portal we store as is
+                        level: id === 'admin' ? 'root' : 'base',
+                        created: serverTimestamp()
+                    });
+                    alert("Identity provisioned successfully. You can now login.");
+                    window.togglePortalMode();
                 } else {
-                    document.body.classList.remove('is-manager');
-                    managerTab.classList.add('hidden');
+                    if (!userSnap.exists() || userSnap.data().key !== key) {
+                        throw new Error("Invalid ID or Key.");
+                    }
+                    // Success Login
+                    loginSuccess(userSnap.data());
                 }
-                renderDocs();
-                syncMetrics();
-            } else {
-                entryError.textContent = validation.reason === 'halt' ? 'ID disabled by management.' : 'Verification failed.';
-                entryError.classList.remove('hidden');
+            } catch (err) {
+                elements.entryError.textContent = err.message;
+                elements.entryError.classList.remove('hidden');
+            } finally {
+                elements.btnLoader.classList.add('hidden');
+                elements.btnText.style.opacity = '1';
             }
         };
 
-        function requestKeyRecovery() {
-            const user = document.getElementById('nodeUser').value || "Unknown";
-            const queue = JSON.parse(localStorage.getItem('recovery_queue') || '[]');
-            queue.push({ user, ts: new Date().toLocaleTimeString() });
-            localStorage.setItem('recovery_queue', JSON.stringify(queue));
-            alert("Recovery packet queued for administrator review.");
-        }
-
-        function terminateSession() { location.reload(); }
-
-        function syncUserRegistry() {
-            managerUserList.innerHTML = `
-                <tr class="border-b border-slate-800/50">
-                    <td class="py-4 px-2 font-bold text-slate-300">Admin</td>
-                    <td class="py-4 px-2 text-rose-400">Primary</td>
-                    <td class="py-4 px-2"><span class="bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded">ACTIVE</span></td>
-                    <td class="py-4 px-2 text-right text-slate-600">—</td>
-                </tr>
-            `;
-            const nodes = fetchNodes();
-            const blacklist = JSON.parse(localStorage.getItem('access_blacklist') || '[]');
-            Object.values(nodes).forEach(n => {
-                const isHalted = blacklist.includes(n.name.toLowerCase());
-                const row = document.createElement('tr');
-                row.className = "border-b border-slate-800/50";
-                row.innerHTML = `
-                    <td class="py-4 px-2 font-bold text-slate-300">${n.name}</td>
-                    <td class="py-4 px-2 text-slate-500">${n.level}</td>
-                    <td class="py-4 px-2"><span class="${isHalted ? 'bg-rose-500/20 text-rose-400' : 'bg-emerald-500/20 text-emerald-400'} px-2 py-0.5 rounded uppercase text-[10px] font-bold">${isHalted ? 'Halted' : 'Online'}</span></td>
-                    <td class="py-4 px-2 text-right">
-                        <button onclick="sysOverride('patch', '${n.name}')" class="text-cyan-400 hover:underline mr-3">Patch</button>
-                        <button onclick="sysOverride('toggle', '${n.name}')" class="text-rose-400 hover:underline">${isHalted ? 'Restore' : 'Suspend'}</button>
-                    </td>
-                `;
-                managerUserList.appendChild(row);
-            });
-        }
-
-        function sysOverride(cmd, name) {
-            const lowerName = name.toLowerCase();
-            if (cmd === 'patch') {
-                const newKey = prompt(`Enter replacement key for ${name}:`, "Key123");
-                if (newKey) {
-                    const nodes = fetchNodes();
-                    if (nodes[lowerName]) {
-                        nodes[lowerName].secret = newKey;
-                        localStorage.setItem('portal_nodes', JSON.stringify(nodes));
-                        addAudit(`Manual Patch: Key updated for ID ${name}.`);
-                    }
-                }
-            } else if (cmd === 'toggle') {
-                let list = JSON.parse(localStorage.getItem('access_blacklist') || '[]');
-                if (list.includes(lowerName)) {
-                    list = list.filter(u => u !== lowerName);
-                    addAudit(`Protocol: ID ${name} restored.`);
-                } else {
-                    if (confirm(`Suspend access for ID ${name}?`)) {
-                        list.push(lowerName);
-                        addAudit(`Alert: ID ${name} access suspended.`);
-                    }
-                }
-                localStorage.setItem('access_blacklist', JSON.stringify(list));
-                syncUserRegistry();
+        const loginSuccess = (data) => {
+            currentUserData = data;
+            elements.entryScreen.classList.add('hidden');
+            elements.interface.classList.remove('hidden');
+            elements.nodeDisplayUser.textContent = data.username;
+            elements.nodeInitial.textContent = data.username.charAt(0).toUpperCase();
+            
+            if (data.level === 'root') {
+                document.body.classList.add('is-manager');
+                elements.managerTab.classList.remove('hidden');
+                elements.managerTab.classList.add('flex');
             }
-        }
 
-        function addAudit(msg) {
-            const box = document.createElement('div');
-            box.className = "text-[10px] p-2 rounded bg-slate-900 border border-slate-800 text-slate-400 mb-2";
-            box.innerHTML = `<span class="text-rose-500 font-bold">[AUDIT]</span> ${msg}`;
-            managerAuditLog.prepend(box);
-        }
+            startRealtimeFeed();
+        };
 
-        function openEntryModal() { entryModal.classList.remove('hidden'); entryModal.classList.add('flex'); }
-        function closeEntryModal() { entryModal.classList.add('hidden'); entryModal.classList.remove('flex'); }
-        
-        function publishEntry() {
-            const t = document.getElementById('entryTitle').value;
-            const b = document.getElementById('entryBody').value;
+        // --- BLOG / FEED LOGIC ---
+
+        const startRealtimeFeed = () => {
+            // Path: /artifacts/{appId}/public/data/publications
+            const pubCol = collection(db, 'artifacts', appId, 'public', 'data', 'publications');
+            
+            onSnapshot(pubCol, (snapshot) => {
+                const docs = [];
+                snapshot.forEach(d => docs.push({id: d.id, ...d.data()}));
+                
+                // Sort by time in memory (Rule 2: avoid complex queries)
+                docs.sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
+                
+                renderFeed(docs);
+            }, (err) => {
+                console.error("Feed error:", err);
+            });
+        };
+
+        const renderFeed = (docs) => {
+            elements.dataStream.innerHTML = '';
+            if (docs.length === 0) {
+                elements.dataStream.innerHTML = `<div class="text-center py-20 text-slate-600 italic">No publications in database.</div>`;
+                return;
+            }
+
+            docs.forEach(pub => {
+                const dateStr = pub.timestamp ? new Date(pub.timestamp.seconds * 1000).toLocaleDateString() : 'Syncing...';
+                const card = document.createElement('div');
+                card.className = "data-card p-6 rounded-2xl border-l-4 border-cyan-500 animate-in fade-in slide-in-from-bottom-2 duration-500";
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-4">
+                        <span class="text-[10px] font-bold text-cyan-400 uppercase tracking-widest">PUBLICATION</span>
+                        <span class="text-[10px] text-slate-500">${dateStr}</span>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">${pub.title}</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed whitespace-pre-wrap">${pub.body}</p>
+                    <div class="mt-4 pt-4 border-t border-slate-800 text-[10px] text-slate-500 italic flex justify-between">
+                        <span>Node: ${pub.author}</span>
+                        <span>Global ID: ${pub.id.substring(0,6)}</span>
+                    </div>
+                `;
+                elements.dataStream.appendChild(card);
+            });
+        };
+
+        window.publishEntry = async () => {
+            const t = document.getElementById('entryTitle').value.trim();
+            const b = document.getElementById('entryBody').value.trim();
             if (!t || !b) return;
-            const docs = fetchDocs();
-            const newDoc = { id: Date.now(), title: t, body: b, date: new Date().toLocaleDateString(), author: sessionActiveUser.id };
-            docs.push(newDoc);
-            localStorage.setItem('portal_docs', JSON.stringify(docs));
-            renderDocs();
-            closeEntryModal();
-            addAudit(`Info: "${t}" added to stream.`);
-        }
 
-        function showSection(id) {
+            const loader = document.getElementById('publishLoader');
+            const btn = document.getElementById('publishBtn');
+            loader.classList.remove('hidden');
+            btn.disabled = true;
+
+            try {
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'publications'), {
+                    title: t,
+                    body: b,
+                    author: currentUserData.username,
+                    timestamp: serverTimestamp()
+                });
+                window.closeEntryModal();
+                document.getElementById('entryTitle').value = '';
+                document.getElementById('entryBody').value = '';
+            } catch (err) {
+                alert("Cloud sync failed. Check connectivity.");
+            } finally {
+                loader.classList.add('hidden');
+                btn.disabled = false;
+            }
+        };
+
+        // UI Helper Functions
+        window.openEntryModal = () => { document.getElementById('entryModal').classList.remove('hidden'); document.getElementById('entryModal').classList.add('flex'); };
+        window.closeEntryModal = () => { document.getElementById('entryModal').classList.add('hidden'); document.getElementById('entryModal').classList.remove('flex'); };
+        window.showSection = (id) => {
             document.querySelectorAll('.nav-item').forEach(e => {
                 e.classList.remove('active');
                 if (e.getAttribute('data-tab') === id) e.classList.add('active');
             });
             document.querySelectorAll('.tab-content').forEach(e => e.classList.add('hidden'));
-            const dest = document.getElementById(`tab-${id}`);
-            if (dest) dest.classList.remove('hidden');
-            if (id === 'manager') syncUserRegistry();
-        }
+            document.getElementById(`tab-${id}`).classList.remove('hidden');
+        };
+        window.initModule = (path) => {
+            document.getElementById('viewportFrame').src = path;
+            document.getElementById('portalViewport').classList.remove('hidden');
+            document.getElementById('portalViewport').classList.add('flex');
+            document.getElementById('viewportTitle').textContent = path.split('.')[0].replace('_', ' ');
+        };
+        window.closePortalModule = () => {
+            document.getElementById('portalViewport').classList.add('hidden');
+            document.getElementById('viewportFrame').src = "";
+        };
+        window.terminateSession = () => location.reload();
 
-        function initModule(path) {
-            viewportFrame.src = path;
-            portalViewport.classList.remove('hidden');
-            portalViewport.classList.add('flex');
-            viewportTitle.textContent = path.replace('.html', '').replace('_', ' ');
-        }
-        function closePortalModule() { portalViewport.classList.add('hidden'); portalViewport.classList.remove('flex'); viewportFrame.src = ""; syncMetrics(); }
-        function refreshModule() { const u = viewportFrame.src; viewportFrame.src = ""; setTimeout(()=>viewportFrame.src=u, 10); }
-        function syncMetrics() {
-            document.querySelectorAll('.metric-val').forEach(m => {
-                const k = m.getAttribute('data-game');
-                m.textContent = localStorage.getItem(k) || 0;
-            });
-        }
+        // Boot
+        initSession();
+
     </script>
 </body>
 </html>
