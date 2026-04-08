@@ -199,11 +199,15 @@
         import { getAuth, signInAnonymously, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const firebaseConfig = JSON.parse(__firebase_config);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'academic-portal-v1';
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+        const firebaseConfig = {
+  apiKey: "AIzaSyA5jic6d7ohWqzZzmaidux1qoHfmlBOaGs",
+  authDomain: "squillexy-8fe0c.firebaseapp.com",
+  projectId: "squillexy-8fe0c",
+  storageBucket: "squillexy-8fe0c.firebasestorage.app",
+  messagingSenderId: "381813182750",
+  appId: "1:381813182750:web:382b1dd8b8c65a17fdf90f",
+  measurementId: "G-BC4Z2DFJB7"
+};
 
         let currentUserData = null;
         let isRegistrationMode = false;
