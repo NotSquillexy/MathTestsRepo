@@ -248,7 +248,7 @@
     <!-- FIREBASE INTEGRATION -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, collection, query, onSnapshot, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Environment Globals
@@ -281,9 +281,29 @@
         // --- AUTH LOGIC ---
 
         const initSession = async () => {
+            // First, ensure we have an anonymous auth session for Firestore access
             await signInAnonymously(auth);
+
+            // Check if there is already a "logged in" user state in local storage
+            const savedUser = localStorage.getItem('portal_user');
+            if (savedUser) {
+                try {
+                    const userData = JSON.parse(savedUser);
+                    // Verify if identity still exists in cloud
+                    const userRef = doc(db, 'artifacts', appId, 'public', 'data', 'identities', userData.username);
+                    const snap = await getDoc(userRef);
+                    if (snap.exists()) {
+                        loginSuccess(snap.data());
+                    } else {
+                        localStorage.removeItem('portal_user');
+                    }
+                } catch (e) {
+                    localStorage.removeItem('portal_user');
+                }
+            }
+
             onAuthStateChanged(auth, (user) => {
-                if (!user) console.warn("No valid session.");
+                if (!user) console.warn("No valid secure session.");
             });
         };
 
@@ -315,7 +335,7 @@
                     }
                     await setDoc(userRef, {
                         username: id,
-                        key: key, // In a real production app, we would hash this, but for this portal we store as is
+                        key: key, 
                         level: id === 'admin' ? 'root' : 'base',
                         created: serverTimestamp()
                     });
@@ -325,7 +345,8 @@
                     if (!userSnap.exists() || userSnap.data().key !== key) {
                         throw new Error("Invalid ID or Key.");
                     }
-                    // Success Login
+                    // Success Login - Persist locally
+                    localStorage.setItem('portal_user', JSON.stringify(userSnap.data()));
                     loginSuccess(userSnap.data());
                 }
             } catch (err) {
@@ -356,16 +377,12 @@
         // --- BLOG / FEED LOGIC ---
 
         const startRealtimeFeed = () => {
-            // Path: /artifacts/{appId}/public/data/publications
             const pubCol = collection(db, 'artifacts', appId, 'public', 'data', 'publications');
             
             onSnapshot(pubCol, (snapshot) => {
                 const docs = [];
                 snapshot.forEach(d => docs.push({id: d.id, ...d.data()}));
-                
-                // Sort by time in memory (Rule 2: avoid complex queries)
                 docs.sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
-                
                 renderFeed(docs);
             }, (err) => {
                 console.error("Feed error:", err);
@@ -420,7 +437,7 @@
                 document.getElementById('entryTitle').value = '';
                 document.getElementById('entryBody').value = '';
             } catch (err) {
-                alert("Cloud sync failed. Check connectivity.");
+                alert("Cloud sync failed.");
             } finally {
                 loader.classList.add('hidden');
                 btn.disabled = false;
@@ -448,7 +465,12 @@
             document.getElementById('portalViewport').classList.add('hidden');
             document.getElementById('viewportFrame').src = "";
         };
-        window.terminateSession = () => location.reload();
+        
+        window.terminateSession = async () => {
+            localStorage.removeItem('portal_user');
+            await signOut(auth);
+            location.reload();
+        };
 
         // Boot
         initSession();
